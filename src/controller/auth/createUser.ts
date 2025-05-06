@@ -25,7 +25,7 @@ export async function createUser(
         userName: formattedUserName,
       },
     });
-
+    console.log("User created successfully:", user);  
     if (user) {
       res.status(200).json({ msg: "Account created" });
       return 
@@ -33,7 +33,9 @@ export async function createUser(
     res.status(400).json({ msg: "error" });
     return 
   } catch (e: any) {
-    next(e);
+    res.status(500).json({ msg:e });
+    return
+    // next(e);
     // if (e?.meta?.target === "User_email_key") {
     //   return res.status(401).json({ msg: "Email exists" });
     // }

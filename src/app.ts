@@ -59,7 +59,7 @@ export const sessionMiddleWare = session({
 });
 server.headersTimeout = 5000;
 server.requestTimeout = 10000;
-app.set("trust proxy", true);
+app.set("trust proxy", false);
 app.use(sessionMiddleWare);
 
 app.use(cors());

@@ -2,6 +2,9 @@ import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import { NextFunction, Request, Response } from "express";
 
+// 定义白名单路径
+  const whitelist = ["/signup"]; // 可以添加更多路径
+
 export const createHashedPassword = (password: string) => {
   return bcrypt.hash(password, 5);
 };
@@ -40,7 +43,6 @@ export const createEmailJWT = (email: string) => {
 
 export const protect = (req: any, res: Response, next: NextFunction) => {
   const bearer = req.headers.authorization;
-
   if (!bearer) {
     res.status(401).json({ msg: "Unauthorized" });
     return 
@@ -64,6 +66,14 @@ export const protect = (req: any, res: Response, next: NextFunction) => {
 };
 
 export const blockJWT = async (req: any, res: Response, next: NextFunction) => {
+  
+  // console.log('req.path:',req.path)
+  // // 检查当前请求路径是否在白名单中
+  // if (whitelist.includes(req.path)) {
+  //   console.log(`Skipping authentication for ${req.path}`);
+  //   next(); 
+  //   return // 跳过认证
+  // }
   const bearer = req.headers.authorization;
   console.log(bearer);
   const tokenFromSession = req.session.token;
