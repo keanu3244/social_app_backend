@@ -74,6 +74,7 @@ export async function loginUser(
     res.status(401).json({ msg: "User Name or Password is incorrect" });
     return 
   } catch (e: any) {
+    console.error(e);
     next(e);
   }
 }

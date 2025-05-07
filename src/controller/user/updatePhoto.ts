@@ -6,7 +6,7 @@ export const updatePhoto = async (
   res: Response,
   next: NextFunction
 ) => {
-  console.log("🚀 ~ file: postPhoto.ts:4 ~ postPhoto ~ req:", req.file);
+  console.log("🚀 ~ file: postPhoto.ts:4 ~ postPhoto ~ req:", req);
   try {
     if (config.stage === "production") {
       const photos = await prisma.user.update({

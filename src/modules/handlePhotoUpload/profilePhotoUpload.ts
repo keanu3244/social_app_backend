@@ -33,20 +33,18 @@ export const profilePhotoUpload = (
             "🚀 ~ file: profilePhotoUpload.ts:24 ~ filetoUpload:",
             filetoUpload
           );
-          const fileResults: any = await s3Config.send(
-            new PutObjectCommand({
+          try {
+            const fileResults: any = await s3Config.send(
+              new PutObjectCommand({
               Bucket: process.env.SPACES_NAME as string,
               Key: `${photo?.filename.split(".")[0]}-sm.gif`,
               Body: filetoUpload,
               ContentType: "image/gif",
-           
-            })
-          );
-          console.log(
-            "🚀 ~ file: profilePhotoUpload.ts:46 ~ fileRes:",
-            fileResults
-          );
-          if (fileResults) {
+              })
+            );
+            console.log("upload result:", fileResults);
+
+             if (fileResults) {
             req.imageUri = `https://${process.env.SPACES_ENDPOINT_WITHOUT_HTTPS}/${
               photo?.filename.split(".")[0]
             }-sm.gif`;
@@ -64,6 +62,13 @@ export const profilePhotoUpload = (
               }
             });
             return next();
+          }
+            // ...
+          } catch (err) {
+            console.error("上传到 S3 出错：", err);
+            // 记得 next(err) 或者返回一个错误响应
+            next(err)
+            return ;
           }
         }
       );
