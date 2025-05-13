@@ -35,6 +35,10 @@ export const getUser = async (req: any, res: Response, next: NextFunction) => {
         followersCount,
         followingCount,
       } = user;
+      // const baseUrl = process.env.IMAGE_BASE_URL || "http://localhost:3000"; // 默认值，可根据需要调整
+      // const fullImageUri = imageUri ? `${baseUrl}${imageUri}` : null;
+      const fullImageUri = imageUri ? `${imageUri}` : null;
+      console.log('返回的图片地址',fullImageUri)
       res.status(200).send({
         data: {
           email,
@@ -48,10 +52,11 @@ export const getUser = async (req: any, res: Response, next: NextFunction) => {
           followingCount: followingCount?.toString(),
         },
       });
-      return 
+      return;
     }
     res.status(404).json({ msg: "user doesnot exist" });
   } catch (e) {
+    console.log('user error',e);
     next(e);
   }
 };

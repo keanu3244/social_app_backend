@@ -3,7 +3,7 @@ import prisma from "../../lib/prisma/init";
 import { getUser } from "../../controller/user/getUser";
 import { getFollows } from "../../controller/user/getFollows";
 import config from "../../config/env";
-import { upload, uploadOcean } from "../../config/multer";
+import { upload } from "../../config/multer";
 import { updatePhoto } from "../../controller/user/updatePhoto";
 import { getGuest } from "../../controller/user/getGuest";
 import { saveNotificationId } from "../../controller/user/saveNotificationId";

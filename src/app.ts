@@ -78,6 +78,9 @@ app.use("/api", globalRouter);
 
 app.use("/api/auth", authRateLimiter, authRouter);
 
+// 配置静态文件服务，提供对 uploads 目录的访问
+app.use("/uploads", express.static(path.join(__dirname, "../uploads")));
+
 app.use("/api/services", blockJWT, protect, services);
 app.use("/api/user", blockJWT, protect, user);
 app.use("/api/chat", blockJWT, protect, chat);

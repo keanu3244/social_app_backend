@@ -1,124 +1,64 @@
 import { NextFunction, Request, Response } from "express";
 import sharp from "sharp";
-import { s3Config } from "../../config/multer/digitalOcean";
-import { PutObjectCommand } from "@aws-sdk/client-s3";
 import { readFileSync, unlink } from "fs";
+import path from "path";
+import imageSize from "image-size";
 
-export const profilePhotoUpload = (
+export const profilePhotoUpload = async (
   req: any,
   res: Response,
   next: NextFunction
 ) => {
-  const photo = req?.file;
-  console.log(
-    "🚀 ~ file: profilePhotoUpload.ts:5 ~ profilePhotoUpload ~ photo:",
-    photo
-  );
-  if (photo?.mimetype === "image/gif") {
-    sharp(`./uploads/${photo?.filename}`, { animated: true })
-      .gif()
-      .resize(300, 300)
-      .toFile(
-        `./uploads/${photo?.filename.split(".")[0]}-sm.gif`,
-        async (err, info) => {
-          console.log(info);
-          if (!info) {
-            return;
-          }
-          const filetoUpload = readFileSync(
-            `./uploads/${photo?.filename.split(".")[0]}-sm.gif`
-          );
+   try {
+    const photo = req.file;
+    if (!photo) {
+      res.status(400).json({ msg: "No file uploaded" });
+      return 
+    } 
 
-          console.log(
-            "🚀 ~ file: profilePhotoUpload.ts:24 ~ filetoUpload:",
-            filetoUpload
-          );
-          try {
-            const fileResults: any = await s3Config.send(
-              new PutObjectCommand({
-              Bucket: process.env.SPACES_NAME as string,
-              Key: `${photo?.filename.split(".")[0]}-sm.gif`,
-              Body: filetoUpload,
-              ContentType: "image/gif",
-              })
-            );
-            console.log("upload result:", fileResults);
+    const ext = path.extname(photo.filename); // e.g. ".jpg" 或 ".gif"
+    const base = path.basename(photo.filename, ext); // 文件名不含扩展名
+    const srcPath = `./uploads/${photo.filename}`;
+    const outFilename = `${base}-sm${ext === ".gif" ? ".gif" : ".jpg"}`;
+    const outPath = `./uploads/${outFilename}`;
 
-             if (fileResults) {
-            req.imageUri = `https://${process.env.SPACES_ENDPOINT_WITHOUT_HTTPS}/${
-              photo?.filename.split(".")[0]
-            }-sm.gif`;
-            unlink(
-              `./uploads/${photo?.filename.split(".")[0]}-sm.gif`,
-              (err) => {
-                if (err) {
-                  console.log("failed to delete");
-                }
-              }
-            );
-            unlink(`./uploads/${photo?.filename}`, (err) => {
-              if (err) {
-                console.log(err,"failed to delete");
-              }
-            });
-            return next();
-          }
-            // ...
-          } catch (err) {
-            console.error("上传到 S3 出错：", err);
-            // 记得 next(err) 或者返回一个错误响应
-            next(err)
-            return ;
-          }
-        }
-      );
-  } else {
-    sharp(`./uploads/${photo?.filename}`)
-      .jpeg({ quality: 90 })
-      .resize(600, 600)
-      .toFile(
-        `./uploads/${photo?.filename.split(".")[0]}-sm.jpg`,
-        async (err, info) => {
-          console.log(info);
-          if (!info) {
-            return;
-          }
-          const filetoUpload = readFileSync(
-            `./uploads/${photo?.filename.split(".")[0]}-sm.jpg`
-          );
-          console.log(
-            "🚀 ~ file: profilePhotoUpload.ts:24 ~ filetoUpload:",
-            filetoUpload
-          );
-          const fileResults: any = await s3Config.send(
-            new PutObjectCommand({
-              Bucket: process.env.SPACES_NAME as string,
-              Key: `${photo?.filename.split(".")[0]}-sm.jpg`,
-              Body: filetoUpload,
-              ContentType: "image/jpeg",
-            })
-          );
-          console.log("ioizik", fileResults)
-          if (fileResults) {
-            req.imageUri = `https://${process.env.SPACES_ENDPOINT_WITHOUT_HTTPS}/${
-              photo?.filename.split(".")[0]
-            }-sm.jpg`;
-            unlink(
-              `./uploads/${photo?.filename.split(".")[0]}-sm.jpg`,
-              (err) => {
-                if (err) {
-                  console.log("failed to delete");
-                }
-              }
-            );
-            unlink(`./uploads/${photo?.filename}`, (err) => {
-              if (err) {
-                console.log("failed to delete");
-              }
-            });
-            return next();
-          }
-        }
-      );
+    // 1. 用 sharp 处理并写入本地
+    if (ext === ".gif") {
+      await sharp(srcPath, { animated: true })
+        .gif()
+        .resize(300, 300)
+        .toFile(outPath);
+    } else {
+      await sharp(srcPath)
+        .jpeg({ quality: 90 })
+        .resize(600, 600)
+        .toFile(outPath);
+    }
+    // 2. 删除原始大图
+    unlink(srcPath, (err) => {
+      if (err) console.error("Failed to delete original file:", err);
+    });
+    // 3. 获取图片尺寸
+    imageSize(outPath, (err, dimensions) => {
+      if (err) {
+        console.error("Image size error:", err);
+        unlink(outPath, (unlinkErr) => {
+          if (unlinkErr) console.error("Failed to delete processed file:", unlinkErr);
+        });
+        res.status(400).json({ msg: "Failed to process image dimensions" });
+        return 
+      } 
+
+      // 4. 构造响应
+      const image = {
+        uri: `/uploads/${outFilename}`, // 假设由 express.static("uploads") 服务
+        width: dimensions?.width || 0,
+        height: dimensions?.height || 0,
+      };
+      req.file.path =`${req.file.path}-sm`; // 挂载到 req，供后续中间件使用
+      return next()
+    });
+  } catch (err) {
+    res.status(500).json({ msg: "Upload failed" });
   }
 };

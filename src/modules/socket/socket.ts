@@ -22,19 +22,19 @@ IO.engine.use(sessionMiddleWare);
 
 IO.use((socket, next) => {
   //@ts-ignore
-  console.log("🍪", socket.handshake.headers);
+  // console.log("🍪", socket.handshake.headers);
 
   const token = socket.handshake?.auth?.token;
 
-  console.log(
-    "🚀 ~ file: socket.ts:17 ~ IO.use ~ token:",
-    socket.handshake?.auth
-  );
+  // console.log(
+  //   "🚀 ~ file: socket.ts:17 ~ IO.use ~ token:",
+  //   socket.handshake?.auth
+  // );
   if (!token) {
     return next(new Error("Not authorized"));
   }
   const user: any = jwt.verify(token, process.env.SECRET || "");
-  console.log("🚀 ~ file: socket.ts:33 ~ IO.use ~ user:", user);
+  // console.log("🚀 ~ file: socket.ts:33 ~ IO.use ~ user:", user);
 
   if (user) {
     socket.data.userId = user.id;
@@ -46,7 +46,7 @@ IO.use((socket, next) => {
 });
 
 IO.on("connection", async (socket) => {
-  console.log(`⚡: ${socket.data.userId} user just connected!`);
+  // console.log(`⚡: ${socket.data.userId} user just connected!`);
 
   const id = socket.data.userId;
   const userName = socket.data.userName;
@@ -64,7 +64,7 @@ IO.on("connection", async (socket) => {
     socket.disconnect();
     onlineState.deleteValue(id);
     IO.emit("online", onlineState.getValues());
-    console.log("🔥: A user disconnected");
+    // console.log("🔥: A user disconnected");
   });
   socket.on("followedStatus", () => {
     followStatusEmit(id, socket);
@@ -73,7 +73,7 @@ IO.on("connection", async (socket) => {
     try {
       socket.join(receiverId);
       const chat: any = await startChatSocket(id, receiverId);
-      console.log("🚀 ~ file: socket.ts:102 ~ socket.on ~ id:", id);
+      // console.log("🚀 ~ file: socket.ts:102 ~ socket.on ~ id:", id);
       if (chat) {
         IO.to(receiverId).emit("newChat", chat);
       }
@@ -81,7 +81,7 @@ IO.on("connection", async (socket) => {
   });
 
   socket.on("chat", async (id: string[]) => {
-    console.log("🚀 ~ file: socket.ts:73 ~ socket.on ~ id:", id);
+    // console.log("🚀 ~ file: socket.ts:73 ~ socket.on ~ id:", id);
     socket.join(id);
 
     //IO.to(id).emit("isOnline", { id, isOnline: true });
@@ -93,8 +93,9 @@ IO.on("connection", async (socket) => {
     }
   );
   socket.on("newPhoto", async (data) => {
+    console.log('收到的图片0',data.message)
     const onlineUsers = onlineState.getValues();
-    console.log("🚀 ~ file: socket.ts:76 ~ socket.on ~ data:", data);
+    // console.log("🚀 ~ file: socket.ts:76 ~ socket.on ~ data:", data);
     IO.to(data.chatId).emit("message", {
       message: {
         sender: data.message.sender,
@@ -110,18 +111,19 @@ IO.on("connection", async (socket) => {
       chatId: data?.chatId,
     });
     socket.emit("sent", true);
+    console.log('收到的图片',data.message)
     addPhoto(data.message.photo, data.chatId, data.id, id)
       .then((e) => {})
       .catch((e) => {});
 
       getReceiverNotificationToken(data.chatId, id)
       .then((r: any) => {
-        console.log("🚀 ~ file: newMessage.ts:26 ~ .then ~ r:", r)
+        // console.log("🚀 ~ file: newMessage.ts:26 ~ .then ~ r:", r)
         if (onlineUsers.includes(r.userId)) {
           console.log("⚠️⚠️⚠️");
           return;
         }
-        console.log("🚀 ~ file: socket.ts:129 ~ .then ~ r:", r);
+        // console.log("🚀 ~ file: socket.ts:129 ~ .then ~ r:", r);
         if (!Expo.isExpoPushToken(r.notificationId)) {
           return;
         }
@@ -155,24 +157,24 @@ IO.on("connection", async (socket) => {
       });
   });
   socket.on("initChat", (id) => {
-    console.log("🚀 ~ file: socket.ts:142 ~ socket.on ~ id:", id);
+    // console.log("🚀 ~ file: socket.ts:142 ~ socket.on ~ id:", id);
     socket.join(id);
     socket.emit("initChat", { id });
   });
   socket.on("isTyping", async (chatId, isTyping) => {
     IO.to(chatId).emit("isTyping", { id, isTyping });
-    console.log("🚀 ~ file: socket.ts:83 ~ socket.on ~ isTyping:", {
-      id,
-      isTyping,
-    });
+    // console.log("🚀 ~ file: socket.ts:83 ~ socket.on ~ isTyping:", {
+    //   id,
+    //   isTyping,
+    // });
   });
   socket.on("away", () => {
-    console.log(`${id} is now away`);
+    // console.log(`${id} is now away`);
     onlineState.deleteValue(id);
     IO.emit("online", onlineState.getValues());
   });
   socket.on("online", () => {
-    console.log(`${id} is now online`);
+    // console.log(`${id} is now online`);
     onlineState.addValue(id);
     IO.emit("online", onlineState.getValues());
   });

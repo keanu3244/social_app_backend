@@ -13,7 +13,7 @@ export const newMessage = async (
   id: string,
   userName: string
 ) => {
-  console.log("🚀 ~ file: socket.ts:76 ~ socket.on ~ data:", data);
+  console.log("新消息", data);
   IO.to(data.chatId).emit("message", data);
   IO.to(data.chatId).emit("newMsg", data);
   socket.emit("sent", true);

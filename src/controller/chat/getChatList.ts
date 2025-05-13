@@ -18,7 +18,6 @@ export const getChatList = async (
       },
       select: {
         id: true,
-
         users: {
           select: {
             userName: true,
@@ -56,6 +55,7 @@ export const getChatList = async (
       },
     });
     if (chatList) {
+      console.log('请求了chatList',chatList[0].messages);
       res.status(200).json({
         chatList,
       });

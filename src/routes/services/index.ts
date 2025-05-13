@@ -1,8 +1,8 @@
-import {
-  uploadOcean,
-  uploadOceanAudio,
-  uploadOceanVideo,
-} from "./../../config/multer";
+// import {
+//   uploadOcean,
+//   uploadOceanAudio,
+//   uploadOceanVideo,
+// } from "./../../config/multer";
 import { handleErrors } from "./../../middleware/validation/handleErrors";
 import {
   createPostValidator,
@@ -59,16 +59,11 @@ router.post("/upload-photo", upload.single("photo"), postPhotoUpload);
 
 router.post(
   "/upload-video",
-  isProduction && uploadOceanVideo
-    ? uploadOceanVideo.single("video")
-    : uploadVideo.single("video"),
+  uploadVideo.single("video"),
   postVideo
 );
 router.post(
-  "/upload-audio",
-  isProduction && uploadOceanAudio
-    ? uploadOceanAudio.single("audio")
-    : uploadAudio.single("audio"),
+  "/upload-audio", uploadAudio.single("audio"),
   postAudio
 );
 router.get("/follow", followValidator, handleErrors, followUser);

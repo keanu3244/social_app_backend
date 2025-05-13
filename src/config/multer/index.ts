@@ -84,47 +84,47 @@ export const uploadAudio = multer({
   fileFilter: fileFilterAudio,
 });
 
-export const uploadOcean =
-  config.stage === "production" &&
-  multer({
-    fileFilter,
-    limits: { fileSize: 16000000 },
-    storage: multerS3({
-      s3: s3Config,
-      bucket: SpacesBucketName,
+// export const uploadOcean =
+//   config.stage === "production" &&
+//   multer({
+//     fileFilter,
+//     limits: { fileSize: 16000000 },
+//     storage: multerS3({
+//       s3: s3Config,
+//       bucket: SpacesBucketName,
    
-      key: function (request: Request, file, cb) {
-        cb(null, uuid().replaceAll("-", "") + path.extname(file.originalname));
-      },
-    }),
-  });
+//       key: function (request: Request, file, cb) {
+//         cb(null, uuid().replaceAll("-", "") + path.extname(file.originalname));
+//       },
+//     }),
+//   });
 
-export const uploadOceanAudio =
-  config.stage === "production" &&
-  multer({
-    fileFilter: fileFilterAudio,
-    limits: { fileSize: 16000000 },
-    storage: multerS3({
-      s3: s3Config,
-      bucket: SpacesBucketName,
+// export const uploadOceanAudio =
+//   config.stage === "production" &&
+//   multer({
+//     fileFilter: fileFilterAudio,
+//     limits: { fileSize: 16000000 },
+//     storage: multerS3({
+//       s3: s3Config,
+//       bucket: SpacesBucketName,
       
-      key: function (request: Request, file, cb) {
-        cb(null, uuid().replaceAll("-", "") + path.extname(file.originalname));
-      },
-    }),
-  });
+//       key: function (request: Request, file, cb) {
+//         cb(null, uuid().replaceAll("-", "") + path.extname(file.originalname));
+//       },
+//     }),
+//   });
 
-export const uploadOceanVideo =
-  config.stage === "production" &&
-  multer({
-    fileFilter: fileFilterVideo,
-    limits: { fileSize: 16000000 },
-    storage: multerS3({
-      s3: s3Config,
-      bucket: SpacesBucketName,
+// export const uploadOceanVideo =
+//   config.stage === "production" &&
+//   multer({
+//     fileFilter: fileFilterVideo,
+//     limits: { fileSize: 16000000 },
+//     storage: multerS3({
+//       s3: s3Config,
+//       bucket: SpacesBucketName,
     
-      key: function (request: Request, file, cb) {
-        cb(null, uuid().replaceAll("-", "") + path.extname(file.originalname));
-      },
-    }),
-  });
+//       key: function (request: Request, file, cb) {
+//         cb(null, uuid().replaceAll("-", "") + path.extname(file.originalname));
+//       },
+//     }),
+//   });

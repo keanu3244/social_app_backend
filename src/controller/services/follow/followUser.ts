@@ -40,6 +40,7 @@ export const followUser = async (
       select: {
         followingIDs: true,
         notificationId: true,
+        imageUri: true,
       },
     });
 
@@ -95,7 +96,7 @@ export const followUser = async (
           req.query.id,
           "Follow",
           undefined,
-          undefined,
+          followedUser?.imageUri||undefined,
           id
         );
         if (

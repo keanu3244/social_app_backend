@@ -24,6 +24,6 @@ export const addMessages = async (
         chat: { connect: { id: chatId } },
       },
     });
-    console.log("🚀 ~ file: getMessages.ts:16 ~ messages:", messages);
+    console.log("🚀 ~ file: addMessages.ts:16 ~ messages:", messages);
   } catch (e) {}
 };
